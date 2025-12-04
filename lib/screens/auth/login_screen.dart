@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() {
-    // UI-only: navigate to Home (stub)
+    // UI-only: navigate to Home
     Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
   }
 

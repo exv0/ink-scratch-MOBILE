@@ -139,7 +139,7 @@ class _HomeDashboard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          // Grid of categories
+          // Grid of categories and stuff
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
