@@ -12,21 +12,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selected = 0;
 
-  final List<Widget> _pages = [
-    const _HomeDashboard(),
-    const Center(child: Text('Library (placeholder)')),
-    const Center(child: Text('Bookmarks (placeholder)')),
-    const Center(child: Text('Profile (placeholder)')),
+  final List<Widget> _pages = const [
+    _HomeDashboard(),
+    Center(child: Text('Library (placeholder)')),
+    Center(child: Text('Bookmarks (placeholder)')),
+    Center(child: Text('Profile (placeholder)')),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Ink Scratch', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {},
@@ -38,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
+      // 🔥 Gradient background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -48,39 +52,32 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: SafeArea(child: _pages[_selected]),
       ),
+
+      // ✅ Floating bottom navigation bar
       bottomNavigationBar: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.orange, AppColors.red],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
           boxShadow: const [
             BoxShadow(
               color: Colors.black26,
-              blurRadius: 12,
-              offset: Offset(0, -4),
+              blurRadius: 18,
+              offset: Offset(0, 8),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+          borderRadius: BorderRadius.circular(22),
           child: BottomNavigationBar(
             currentIndex: _selected,
             onTap: (i) => setState(() => _selected = i),
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.white,
             elevation: 0,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
-            showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
+            selectedItemColor: AppColors.orange,
+            unselectedItemColor: AppColors.textSecondary,
+            showUnselectedLabels: true,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
               BottomNavigationBarItem(
@@ -109,7 +106,7 @@ class _HomeDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // Greeting + avatar
@@ -126,12 +123,14 @@ class _HomeDashboard extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 18),
+
           // Featured card
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withOpacity(0.14),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -173,8 +172,10 @@ class _HomeDashboard extends StatelessWidget {
               ],
             ),
           ),
+
           const SizedBox(height: 18),
-          // Grid of categories
+
+          // Categories grid
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -196,7 +197,7 @@ class _HomeDashboard extends StatelessWidget {
 
   Widget _categoryCard(IconData icon, String title) {
     return Card(
-      color: Colors.white.withOpacity(0.12),
+      color: Colors.white.withOpacity(0.14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
         onTap: () {},
