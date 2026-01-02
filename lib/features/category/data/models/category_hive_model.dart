@@ -1,44 +1,39 @@
 import 'package:hive/hive.dart';
-import '../../domain/entities/category_entity.dart';
 
 part 'category_hive_model.g.dart';
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 1)
 class CategoryHiveModel extends HiveObject {
   @HiveField(0)
-  String id;
+  final String id;
 
   @HiveField(1)
-  String name;
+  final String name;
 
   @HiveField(2)
-  String? description;
+  final int color;
 
   @HiveField(3)
-  String createdAt;
+  final DateTime createdAt;
 
   CategoryHiveModel({
     required this.id,
     required this.name,
-    this.description,
+    required this.color,
     required this.createdAt,
   });
 
-  factory CategoryHiveModel.fromEntity(CategoryEntity entity) {
+  // Factory for easy creation with auto timestamp
+  factory CategoryHiveModel.create({
+    required String id,
+    required String name,
+    required int color,
+  }) {
     return CategoryHiveModel(
-      id: entity.id,
-      name: entity.name,
-      description: entity.description,
-      createdAt: entity.createdAt.toIso8601String(),
-    );
-  }
-
-  CategoryEntity toEntity() {
-    return CategoryEntity(
       id: id,
       name: name,
-      description: description,
-      createdAt: DateTime.parse(createdAt),
+      color: color,
+      createdAt: DateTime.now(),
     );
   }
 }
