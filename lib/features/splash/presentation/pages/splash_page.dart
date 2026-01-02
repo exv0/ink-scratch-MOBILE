@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../onboarding/presentation/pages/onboarding_page.dart';
 import '../../../auth/presentation/pages/login_page.dart';
+import '../../../auth/presentation/view_model/auth_viewmodel.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../../../../core/services/hive/hive_service.dart';
 
@@ -16,26 +18,33 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _checkNavigation();
+    // Use addPostFrameCallback to avoid ref.listen issues
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkNavigation();
+    });
   }
 
   Future<void> _checkNavigation() async {
+    // Check current user through the ViewModel
+    await ref.read(authViewModelProvider.notifier).checkCurrentUser();
+
     await Future.delayed(const Duration(seconds: 2)); // Splash delay
 
     final hive = HiveService();
-    final isOnboardingSeen = await hive.isOnboardingSeen();
-    final currentUser = hive.getCurrentUser();
+    final isOnboardingSeen = hive.isOnboardingSeen();
+    final authState = ref.read(authViewModelProvider);
 
     Widget nextPage;
     if (!isOnboardingSeen) {
       nextPage = const OnboardingPage();
-    } else if (currentUser == null) {
+    } else if (!authState.isAuthenticated || authState.currentUser == null) {
       nextPage = const LoginPage();
     } else {
       nextPage = const DashboardPage();
     }
 
     if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => nextPage),
@@ -50,7 +59,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/logo.png", width: 150), // Add your app logo
+            const Icon(Icons.book_rounded, size: 150, color: Colors.white),
             const SizedBox(height: 20),
             const Text(
               "Ink Scratch",
