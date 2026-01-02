@@ -161,4 +161,4 @@ class AppTheme {
       margin: EdgeInsets.zero,
     ),
   );
-
+}
