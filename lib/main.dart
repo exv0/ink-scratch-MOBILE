@@ -1,36 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'theme/app_theme.dart';
-import 'screens/splash_screen.dart';
-import 'screens/onboarding_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/signup_screen.dart';
-import 'screens/home/home_screen.dart';
-import 'screens/home/dashboard_screen.dart';
+import 'core/services/hive/hive_service.dart';
+import 'app/themes/theme_provider.dart'; // ← This is the key import
+import 'features/splash/presentation/pages/splash_page.dart';
 
-void main() {
-  runApp(const ProviderScope(child: InkScratchApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await HiveService().init();
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class InkScratchApp extends StatelessWidget {
-  const InkScratchApp({super.key});
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeProvider); // ← Watches the current theme
+
     return MaterialApp(
       title: 'Ink Scratch',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: SplashScreen.routeName,
-      routes: {
-        SplashScreen.routeName: (_) => const SplashScreen(),
-        OnboardingScreen.routeName: (_) => const OnboardingScreen(),
-        LoginScreen.routeName: (_) => const LoginScreen(),
-        RegisterScreen.routeName: (_) => const RegisterScreen(),
-        DashboardScreen.routeName: (_) => const DashboardScreen(),
-        HomeScreen.routeName: (_) => const HomeScreen(),
-      },
+      theme: theme, // ← Applies your custom light/dark theme
+      themeMode: ThemeMode
+          .system, // ← Respects system preference (can be changed later)
+      home: const SplashPage(),
     );
   }
 }
