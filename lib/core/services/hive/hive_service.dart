@@ -1,86 +1,92 @@
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:ink_scratch/features/auth/data/models/auth_hive_model.dart';
-import 'package:ink_scratch/features/auth/domain/entities/auth_entity.dart';
-import 'package:ink_scratch/features/category/data/models/category_hive_model.dart';
-import 'package:ink_scratch/features/category/domain/entities/category_entity.dart';
-import 'package:ink_scratch/core/constants/hive_table_constant.dart';
+import '../../../features/auth/data/models/auth_hive_model.dart';
+import '../../../features/category/data/models/category_hive_model.dart';
+import '../../constants/hive_table_constant.dart';
 
 class HiveService {
   static final HiveService _instance = HiveService._internal();
   factory HiveService() => _instance;
   HiveService._internal();
 
-  late Box<AuthHiveModel> _authBox;
-  late Box _settingsBox;
-  late Box<CategoryHiveModel> _categoryBox;
-
   Future<void> init() async {
+    await Hive.initFlutter();
+
     // Register adapters
-    Hive.registerAdapter(AuthHiveModelAdapter());
-    Hive.registerAdapter(CategoryHiveModelAdapter());
+    if (!Hive.isAdapterRegistered(HiveTableConstant.authTypeId)) {
+      Hive.registerAdapter(AuthHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.categoryTypeId)) {
+      Hive.registerAdapter(CategoryHiveModelAdapter());
+    }
 
     // Open boxes
-    _authBox = await Hive.openBox<AuthHiveModel>('authBox');
-    _settingsBox = await Hive.openBox('appSettingsBox');
-    _categoryBox = await Hive.openBox<CategoryHiveModel>('categoryBox');
+    await Hive.openBox<AuthHiveModel>(HiveTableConstant.authBox);
+    await Hive.openBox<CategoryHiveModel>(HiveTableConstant.categoryBox);
+    await Hive.openBox(HiveTableConstant.sessionBox);
   }
 
-  // ==================== AUTH METHODS ====================
+  // ==================== Auth Methods ====================
 
-  /// Save authenticated user to Hive
-  Future<void> saveUser(AuthEntity user) async {
-    final hiveModel = AuthHiveModel.fromEntity(user);
-    await _authBox.put('current_user', hiveModel);
+  Future<void> saveUser(AuthHiveModel user) async {
+    final box = Hive.box<AuthHiveModel>(HiveTableConstant.authBox);
+    await box.put(user.id, user);
   }
 
-  /// Get current authenticated user (returns AuthEntity or null)
-  AuthEntity? getCurrentUser() {
-    final hiveModel = _authBox.get('current_user');
-    return hiveModel?.toEntity();
+  List<AuthHiveModel> getAllUsers() {
+    final box = Hive.box<AuthHiveModel>(HiveTableConstant.authBox);
+    return box.values.toList();
   }
 
-  /// Logout - delete current user
+  Future<void> saveCurrentUser(AuthHiveModel user) async {
+    final box = Hive.box(HiveTableConstant.sessionBox);
+    await box.put(HiveTableConstant.currentUserKey, user.id);
+  }
+
+  AuthHiveModel? getCurrentUser() {
+    final box = Hive.box(HiveTableConstant.sessionBox);
+    final userId = box.get(HiveTableConstant.currentUserKey);
+    if (userId == null) return null;
+    final authBox = Hive.box<AuthHiveModel>(HiveTableConstant.authBox);
+    return authBox.get(userId);
+  }
+
   Future<void> logout() async {
-    await _authBox.delete('current_user');
+    final box = Hive.box(HiveTableConstant.sessionBox);
+    await box.delete(HiveTableConstant.currentUserKey);
   }
 
-  // ==================== ONBOARDING ====================
+  // ==================== Category Methods ====================
 
-  Future<bool> isOnboardingSeen() async {
-    return _settingsBox.get(
-          HiveTableConstant.onboardingSeenKey,
-          defaultValue: false,
-        )
-        as bool;
+  Future<void> saveCategory(CategoryHiveModel category) async {
+    final box = Hive.box<CategoryHiveModel>(HiveTableConstant.categoryBox);
+    await box.put(category.id, category);
   }
 
-  Future<void> setOnboardingSeen() async {
-    await _settingsBox.put(HiveTableConstant.onboardingSeenKey, true);
+  List<CategoryHiveModel> getAllCategories() {
+    final box = Hive.box<CategoryHiveModel>(HiveTableConstant.categoryBox);
+    return box.values.toList();
   }
 
-  // ==================== CATEGORY METHODS ====================
-
-  Future<void> addCategory(CategoryEntity category) async {
-    final hiveModel = CategoryHiveModel.fromEntity(category);
-    await _categoryBox.put(category.id, hiveModel);
-  }
-
-  Future<void> updateCategory(CategoryEntity category) async {
-    final hiveModel = CategoryHiveModel.fromEntity(category);
-    await _categoryBox.put(category.id, hiveModel);
+  Future<void> updateCategory(CategoryHiveModel category) async {
+    final box = Hive.box<CategoryHiveModel>(HiveTableConstant.categoryBox);
+    await box.put(category.id, category);
   }
 
   Future<void> deleteCategory(String id) async {
-    await _categoryBox.delete(id);
+    final box = Hive.box<CategoryHiveModel>(HiveTableConstant.categoryBox);
+    await box.delete(id);
   }
 
-  CategoryEntity? getCategoryById(String id) {
-    final hiveModel = _categoryBox.get(id);
-    return hiveModel?.toEntity();
+  // ==================== Onboarding ====================
+
+  Future<void> setOnboardingSeen() async {
+    final box = Hive.box(HiveTableConstant.sessionBox);
+    await box.put('onboarding_seen', true);
   }
 
-  List<CategoryEntity> getAllCategories() {
-    return _categoryBox.values.map((e) => e.toEntity()).toList();
+  bool isOnboardingSeen() {
+    final box = Hive.box(HiveTableConstant.sessionBox);
+    return box.get('onboarding_seen', defaultValue: false);
   }
 }
