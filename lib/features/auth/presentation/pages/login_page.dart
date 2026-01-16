@@ -1,7 +1,8 @@
+// lib/features/auth/presentation/pages/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../view_model/auth_viewmodel.dart';
+import '../view_model/auth_viewmodel_provider.dart'; // ✅ Changed import
 import 'signup_page.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 
@@ -37,7 +38,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           context,
           MaterialPageRoute(builder: (_) => const DashboardPage()),
         );
-        return; // ✅ Return early to prevent error snackbar from showing
+        return;
       }
 
       // Show error only if there's an error AND we're not authenticated
