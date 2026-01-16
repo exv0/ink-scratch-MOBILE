@@ -1,6 +1,7 @@
+// lib/features/dashboard/presentation/pages/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../auth/presentation/view_model/auth_viewmodel.dart';
+import '../../../auth/presentation/view_model/auth_viewmodel_provider.dart'; // ✅ Changed import
 import '../../../auth/presentation/pages/login_page.dart';
 
 class ProfileScreen extends ConsumerWidget {
