@@ -1,0 +1,58 @@
+// lib/features/auth/data/repositories/auth_repository.dart
+import '../../domain/entities/auth_entity.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../datasources/remote/auth_remote_datasource.dart';
+import '../../../../core/error/exception.dart';
+
+class AuthRepositoryImpl implements AuthRepository {
+  final AuthRemoteDatasource remoteDatasource;
+
+  AuthRepositoryImpl({required this.remoteDatasource});
+
+  @override
+  Future<AuthEntity> register({
+    required String fullName,
+    String? phoneNumber, // ✅ Made nullable
+    required String gender,
+    required String email,
+    required String username,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final auth = await remoteDatasource.register(
+        fullName: fullName,
+        phoneNumber: phoneNumber ?? '', // ✅ Provide empty string if null
+        gender: gender,
+        email: email,
+        username: username,
+        password: password,
+        confirmPassword: confirmPassword,
+      );
+      return auth;
+    } on ServerException {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<AuthEntity> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final auth = await remoteDatasource.login(
+        email: email,
+        password: password,
+      );
+      return auth;
+    } on ServerException {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    await remoteDatasource.logout();
+  }
+}
