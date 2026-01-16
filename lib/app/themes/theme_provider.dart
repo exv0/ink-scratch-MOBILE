@@ -1,7 +1,7 @@
+// lib/app/themes/theme_provider.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart'; // ← This fixes StateProvider
-import 'dart:ui'; // ← This fixes PlatformDispatcher
+import 'dart:ui';
 
 import 'app_theme.dart';
 
@@ -16,7 +16,7 @@ final themeModeProvider = StateProvider<ThemeModeOption>((ref) {
 final themeProvider = Provider<ThemeData>((ref) {
   final selectedMode = ref.watch(themeModeProvider);
 
-  // Get current system brightness (non-deprecated, works without context)
+  // Get current system brightness
   final platformBrightness = PlatformDispatcher.instance.platformBrightness;
 
   final isDark = switch (selectedMode) {
