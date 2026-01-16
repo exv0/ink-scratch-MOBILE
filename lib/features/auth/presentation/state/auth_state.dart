@@ -6,7 +6,7 @@ class AuthState {
   final AuthEntity? currentUser;
   final String? error;
 
-  AuthState({
+  const AuthState({
     required this.isLoading,
     required this.isAuthenticated,
     this.currentUser,
@@ -14,7 +14,7 @@ class AuthState {
   });
 
   factory AuthState.initial() {
-    return AuthState(
+    return const AuthState(
       isLoading: false,
       isAuthenticated: false,
       currentUser: null,
@@ -26,13 +26,13 @@ class AuthState {
     bool? isLoading,
     bool? isAuthenticated,
     AuthEntity? currentUser,
-    String? error,
+    String? error, // <-- now allows clearing error
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       currentUser: currentUser ?? this.currentUser,
-      error: error ?? this.error,
+      error: error, // <-- use directly, so passing null clears previous error
     );
   }
 }
