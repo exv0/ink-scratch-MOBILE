@@ -1,9 +1,10 @@
+// lib/features/splash/presentation/pages/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../onboarding/presentation/pages/onboarding_page.dart';
 import '../../../auth/presentation/pages/login_page.dart';
-import '../../../auth/presentation/view_model/auth_viewmodel.dart';
+import '../../../auth/presentation/view_model/auth_viewmodel_provider.dart'; // ✅ Changed import
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../../../../core/services/hive/hive_service.dart';
 
@@ -18,7 +19,6 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback to avoid ref.listen issues
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkNavigation();
     });
