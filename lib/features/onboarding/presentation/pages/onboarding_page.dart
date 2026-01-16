@@ -1,6 +1,6 @@
+// lib/features/onboarding/presentation/pages/onboarding_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart'; // ← Fixes StateProvider in Riverpod 3.0+
 
 import 'package:ink_scratch/core/services/hive/hive_service.dart';
 import 'package:ink_scratch/features/onboarding/domain/entities/onboarding_item.dart';
@@ -50,7 +50,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   void _completeOnboarding() {
-    HiveService().setOnboardingSeen(); // ← Removed await - method is not async
+    HiveService().setOnboardingSeen();
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
