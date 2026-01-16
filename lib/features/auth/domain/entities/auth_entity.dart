@@ -2,7 +2,7 @@ class AuthEntity {
   final String id;
   final String username;
   final String email;
-  final String? token; // if you plan to add real API later
+  final String? token; // JWT token
 
   AuthEntity({
     required this.id,
@@ -11,16 +11,33 @@ class AuthEntity {
     this.token,
   });
 
-  Map<String, dynamic> toMap() {
-    return {'id': id, 'username': username, 'email': email, 'token': token};
-  }
-
-  factory AuthEntity.fromMap(Map<String, dynamic> map) {
+  /// Factory to create AuthEntity from a Map (e.g., backend JSON)
+  factory AuthEntity.fromMap(Map<String, dynamic> map, {String? token}) {
     return AuthEntity(
-      id: map['id'] ?? '',
+      id: map['_id'] ?? '', // adjust if your backend uses 'id' instead of '_id'
       username: map['username'] ?? '',
       email: map['email'] ?? '',
-      token: map['token'],
+      token: token,
+    );
+  }
+
+  /// Convert AuthEntity to a Map (optional, useful for local storage)
+  Map<String, dynamic> toMap() {
+    return {'_id': id, 'username': username, 'email': email, 'token': token};
+  }
+
+  /// Optional: copyWith to update AuthEntity
+  AuthEntity copyWith({
+    String? id,
+    String? username,
+    String? email,
+    String? token,
+  }) {
+    return AuthEntity(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      token: token ?? this.token,
     );
   }
 }
