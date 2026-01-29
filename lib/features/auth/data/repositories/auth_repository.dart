@@ -1,8 +1,10 @@
-// lib/features/auth/data/repositories/auth_repository.dart
+// lib/features/auth/data/repositories/auth_repository_impl.dart
+import 'package:dartz/dartz.dart';
 import '../../domain/entities/auth_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
 import '../../../../core/error/exception.dart';
+import '../../../../core/error/failures.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource remoteDatasource;
@@ -12,7 +14,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthEntity> register({
     required String fullName,
-    String? phoneNumber, // ✅ Made nullable
+    String? phoneNumber,
     required String gender,
     required String email,
     required String username,
@@ -22,7 +24,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final auth = await remoteDatasource.register(
         fullName: fullName,
-        phoneNumber: phoneNumber ?? '', // ✅ Provide empty string if null
+        phoneNumber: phoneNumber ?? '',
         gender: gender,
         email: email,
         username: username,
@@ -54,5 +56,24 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await remoteDatasource.logout();
+  }
+
+  // ✅ Add this method
+  @override
+  Future<Either<Failure, AuthEntity>> updateProfile({
+    String? bio,
+    String? profilePicturePath,
+  }) async {
+    try {
+      final authEntity = await remoteDatasource.updateProfile(
+        bio: bio,
+        profilePicturePath: profilePicturePath,
+      );
+      return Right(authEntity);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }

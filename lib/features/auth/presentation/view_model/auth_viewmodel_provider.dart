@@ -10,10 +10,14 @@ final authViewModelProvider = StateNotifierProvider<AuthViewModel, AuthState>((
   final loginUseCase = ref.read(loginUseCaseProvider);
   final registerUseCase = ref.read(registerUseCaseProvider);
   final logoutUseCase = ref.read(logoutUseCaseProvider);
+  final updateProfileUseCase = ref.read(
+    updateProfileUseCaseProvider,
+  ); // ✅ Add this
 
   return AuthViewModel(
     loginUseCase: loginUseCase,
     registerUseCase: registerUseCase,
     logoutUseCase: logoutUseCase,
+    updateProfileUseCase: updateProfileUseCase, // ✅ Add this
   );
 });
