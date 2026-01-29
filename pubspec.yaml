@@ -16,7 +16,12 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   crypto: ^3.0.7
-  dio: ^5.9.0
+  dio: ^5.9.1
+  image_picker: ^1.2.1
+  path_provider: ^2.1.5
+  logger: ^2.6.2
+  mockito: ^5.4.4
+  dartz: ^0.10.1
 
 dev_dependencies:
   flutter_test:
