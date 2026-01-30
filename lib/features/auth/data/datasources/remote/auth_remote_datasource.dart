@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ink_scratch/core/services/storage/user_session_service.dart';
 import 'package:ink_scratch/core/error/exception.dart';
 import 'package:ink_scratch/core/api/api_client.dart';
 import 'package:ink_scratch/features/auth/domain/entities/auth_entity.dart';
-import 'package:logger/logger.dart'; // Import the logger package
+import 'package:logger/logger.dart';
 
 class AuthRemoteDatasource {
   final ApiClient apiClient;
   final UserSessionService sessionService;
-  final Logger logger = Logger(); // Create an instance of Logger
+  final Logger logger = Logger();
 
   AuthRemoteDatasource({required this.apiClient, required this.sessionService});
 
@@ -23,7 +24,6 @@ class AuthRemoteDatasource {
     required String confirmPassword,
   }) async {
     try {
-      // Use logger for logging instead of print
       logger.d('REGISTER REQUEST:');
       logger.d('   URL: ${apiClient.client.options.baseUrl}/register');
       logger.d(
@@ -63,7 +63,6 @@ class AuthRemoteDatasource {
         );
       }
     } on DioException catch (e) {
-      // Log the error using the logger
       logger.e(
         'REGISTER ERROR: Type: ${e.type}, Message: ${e.message}, Response: ${e.response?.data}, Status: ${e.response?.statusCode}',
       );
@@ -99,7 +98,6 @@ class AuthRemoteDatasource {
         final userData = response.data['data'];
         final token = response.data['token'] as String;
 
-        // Save token locally
         await sessionService.saveToken(token);
         logger.d('Token saved: ${token.substring(0, 20)}...');
 
@@ -128,6 +126,7 @@ class AuthRemoteDatasource {
   }
 
   /// Update user profile (bio and profile picture)
+  /// ✅ Works on both WEB and PHYSICAL DEVICES
   Future<AuthEntity> updateProfile({
     String? bio,
     String? profilePicturePath,
@@ -146,15 +145,46 @@ class AuthRemoteDatasource {
 
       // Add profile image if provided
       if (profilePicturePath != null && profilePicturePath.isNotEmpty) {
-        formData.files.add(
-          MapEntry(
-            'profileImage',
-            await MultipartFile.fromFile(
-              profilePicturePath,
-              filename: profilePicturePath.split('/').last,
-            ),
-          ),
-        );
+        // ✅ Handle both WEB (blob: URLs) and MOBILE (file paths)
+        if (profilePicturePath.startsWith('blob:')) {
+          // WEB: Use XFile to read bytes from blob URL
+          logger.d('   Detected WEB environment (blob URL)');
+          try {
+            final xFile = XFile(profilePicturePath);
+            final bytes = await xFile.readAsBytes();
+            final fileName =
+                'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+            formData.files.add(
+              MapEntry(
+                'profileImage',
+                MultipartFile.fromBytes(bytes, filename: fileName),
+              ),
+            );
+            logger.d('   Image bytes loaded: ${bytes.length} bytes');
+          } catch (e) {
+            logger.e('   Error reading image bytes: $e');
+            throw ServerException('Failed to read image file');
+          }
+        } else {
+          // MOBILE: Use file path directly
+          logger.d('   Detected MOBILE environment (file path)');
+          try {
+            formData.files.add(
+              MapEntry(
+                'profileImage',
+                await MultipartFile.fromFile(
+                  profilePicturePath,
+                  filename: profilePicturePath.split('/').last,
+                ),
+              ),
+            );
+            logger.d('   File added from path: $profilePicturePath');
+          } catch (e) {
+            logger.e('   Error reading file: $e');
+            throw ServerException('Failed to read image file');
+          }
+        }
       }
 
       final response = await apiClient.client.put(
