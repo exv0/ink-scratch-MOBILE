@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ink_scratch/core/config/app_config.dart'; // ✅ Import AppConfig
 import 'package:ink_scratch/features/auth/presentation/view_model/auth_viewmodel_provider.dart';
 import 'package:ink_scratch/features/dashboard/presentation/pages/edit_profile_screen.dart';
 
