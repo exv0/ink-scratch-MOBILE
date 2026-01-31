@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ink_scratch/core/config/app_config.dart'; // ✅ Import AppConfig
 import 'package:ink_scratch/features/auth/presentation/view_model/auth_viewmodel_provider.dart';
 import 'package:ink_scratch/features/dashboard/presentation/pages/edit_profile_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
-
-  static const String baseUrl = 'http://192.168.1.70:3000';
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authViewModelProvider);
@@ -15,9 +13,10 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    // ✅ FIXED: Use the profilePicture directly - backend now returns full URL
     final ImageProvider? profileImageProvider =
         (user?.profilePicture != null && user!.profilePicture!.isNotEmpty)
-        ? NetworkImage('$baseUrl/${user.profilePicture!.replaceAll('\\', '/')}')
+        ? NetworkImage(user.profilePicture!) // ✅ Just use the URL directly
         : null;
 
     // Accent color used throughout
