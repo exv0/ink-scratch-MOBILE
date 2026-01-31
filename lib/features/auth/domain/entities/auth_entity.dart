@@ -2,66 +2,80 @@ class AuthEntity {
   final String id;
   final String username;
   final String email;
-  final String? fullName; // ✅ Add this
-  final String? bio; // ✅ Add this
-  final String? token; // JWT token
-  final String?
-  profilePicture; // ✅ Changed from profileImageUrl to match backend
+  final String? fullName;
+  final String? phoneNumber;
+  final String? gender;
+  final String? bio;
+  final String? token;
+  final String? profilePicture;
+  final String? role;
 
   AuthEntity({
     required this.id,
     required this.username,
     required this.email,
-    this.fullName, // ✅ Add this
-    this.bio, // ✅ Add this
+    this.fullName,
+    this.phoneNumber,
+    this.gender,
+    this.bio,
     this.token,
-    this.profilePicture, // ✅ Changed name
+    this.profilePicture,
+    this.role,
   });
 
-  /// Factory to create AuthEntity from a Map (e.g., backend JSON)
   factory AuthEntity.fromMap(Map<String, dynamic> map, {String? token}) {
     return AuthEntity(
       id: map['_id'] ?? '',
       username: map['username'] ?? '',
       email: map['email'] ?? '',
-      fullName: map['fullName'], // ✅ Add this
-      bio: map['bio'], // ✅ Add this
+      fullName: map['fullName'],
+      phoneNumber: map['phoneNumber'],
+      gender: map['gender'],
+      bio: map['bio'],
       token: token,
-      profilePicture: map['profilePicture'], // ✅ Match backend field name
+      profilePicture: map['profilePicture'],
+      role: map['role'],
     );
   }
 
-  /// Convert AuthEntity to a Map (optional, useful for local storage)
   Map<String, dynamic> toMap() {
     return {
       '_id': id,
       'username': username,
       'email': email,
-      'fullName': fullName, // ✅ Add this
-      'bio': bio, // ✅ Add this
+      'fullName': fullName,
+      'phoneNumber': phoneNumber,
+      'gender': gender,
+      'bio': bio,
       'token': token,
-      'profilePicture': profilePicture, // ✅ Changed name
+      'profilePicture': profilePicture,
+      'role': role,
     };
   }
 
-  /// Optional: copyWith to update AuthEntity
   AuthEntity copyWith({
     String? id,
     String? username,
     String? email,
-    String? fullName, // ✅ Add this
-    String? bio, // ✅ Add this
+    String? fullName,
+    String? phoneNumber,
+    String? gender,
+    String? bio,
     String? token,
-    String? profilePicture, // ✅ Changed name
+    String? profilePicture,
+    String? role,
   }) {
     return AuthEntity(
       id: id ?? this.id,
       username: username ?? this.username,
       email: email ?? this.email,
-      fullName: fullName ?? this.fullName, // ✅ Add this
-      bio: bio ?? this.bio, // ✅ Add this
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      gender: gender ?? this.gender,
+      bio: bio ?? this.bio,
       token: token ?? this.token,
-      profilePicture: profilePicture ?? this.profilePicture, // ✅ Changed name
+      profilePicture: profilePicture ?? this.profilePicture,
+      role: role ?? this.role,
     );
   }
 }
