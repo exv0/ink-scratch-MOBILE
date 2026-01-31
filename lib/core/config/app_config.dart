@@ -1,18 +1,77 @@
 // lib/core/config/app_config.dart
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
+
 class AppConfig {
-  // IMPORTANT: Choose the right URL based on where you're testing:
+  // ✅ STEP 1: Set your computer's current IP address here
+  // Find it by running 'ipconfig' on Windows (look for IPv4 Address)
+  // Update this when your IP changes!
+  static const String _computerIp =
+      '192.168.1.70'; // ← UPDATE THIS WHEN YOUR IP CHANGES
 
-  // For Android Emulator:
-  // static const String baseUrl = 'http://10.0.2.2:3000/api/auth';
+  // ✅ STEP 2: The config automatically handles the rest!
+  static String get baseUrl {
+    if (kIsWeb) {
+      // Flutter Web (Chrome, Edge, etc.)
+      return 'http://localhost:3000/api';
+    } else {
+      try {
+        if (Platform.isAndroid) {
+          // Android Emulator uses special IP
+          // For physical Android devices, use your computer's IP
+          return 'http://$_computerIp:3000/api';
+        } else if (Platform.isIOS) {
+          // iOS Simulator can use localhost
+          return 'http://localhost:3000/api';
+        } else {
+          // Physical device fallback
+          return 'http://$_computerIp:3000/api';
+        }
+      } catch (e) {
+        // Fallback if Platform is not available
+        return 'http://localhost:3000/api';
+      }
+    }
+  }
 
-  // For iOS Simulator or Web (running Flutter on same machine as backend):
-  // static const String baseUrl = 'http://localhost:3000/api/auth';
+  // ✅ Helper to get the full image base URL (without /api)
+  static String get imageBaseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:3000';
+    } else {
+      try {
+        if (Platform.isAndroid) {
+          return 'http://$_computerIp:3000';
+        } else if (Platform.isIOS) {
+          return 'http://localhost:3000';
+        } else {
+          return 'http://$_computerIp:3000';
+        }
+      } catch (e) {
+        return 'http://localhost:3000';
+      }
+    }
+  }
 
-  // For Physical Device (replace with your computer's IP):
-  // Find your IP: Run 'ipconfig' on Windows, look for IPv4 Address
+  // App name
+  static const String appName = 'InkScratch';
 
-  static const String baseUrl = 'http://192.168.1.70:3000/api/auth';
-
+  // API timeouts
   static const int connectTimeout = 15000;
   static const int receiveTimeout = 15000;
+
+  // Storage keys
+  static const String tokenKey = 'auth_token';
+  static const String userKey = 'user_data';
+
+  // ✅ Print config info (useful for debugging)
+  static void printConfig() {
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('📱 App Config:');
+    print('   Platform: ${kIsWeb ? "Web" : Platform.operatingSystem}');
+    print('   API Base URL: $baseUrl');
+    print('   Image Base URL: $imageBaseUrl');
+    print('   Computer IP: $_computerIp');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  }
 }
