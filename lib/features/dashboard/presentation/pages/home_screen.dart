@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ink_scratch/features/auth/presentation/view_model/auth_viewmodel_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  static const Color _accent = Color(0xFF6C63FF);
 
   final List<Map<String, dynamic>> continueReading = const [
     {"title": "One Piece", "chapter": 1124, "progress": 75},
@@ -9,384 +13,486 @@ class HomeScreen extends StatelessWidget {
     {"title": "Chainsaw Man", "chapter": 170, "progress": 90},
   ];
 
-  final List<String> myLibrary = const [
-    "Berserk",
-    "Vinland Saga",
-    "Attack on Titan",
-    "Demon Slayer",
-    "Solo Leveling",
-    "My Hero Academia",
-    "Tokyo Ghoul",
-    "Naruto",
+  final List<Map<String, dynamic>> myLibrary = const [
+    {"title": "Berserk", "color": 0xFF8B0000},
+    {"title": "Vinland Saga", "color": 0xFF1A5276},
+    {"title": "Attack on Titan", "color": 0xFF922B21},
+    {"title": "Demon Slayer", "color": 0xFF1F618D},
+    {"title": "Solo Leveling", "color": 0xFF4A235A},
+    {"title": "My Hero Academia", "color": 0xFF1E8449},
+    {"title": "Tokyo Ghoul", "color": 0xFF212121},
+    {"title": "Naruto", "color": 0xFFD35400},
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final user = ref.watch(authViewModelProvider).currentUser;
+    final String username = user?.username ?? 'User';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Ink Scratch",
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              // TODO: Implement search
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // TODO: Implement notifications
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Greeting Section with enhanced styling
-              Container(
-                padding: const EdgeInsets.all(20),
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : const Color(0xFFF5F5F7),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // ─── Gradient Header ────────────────────────────────────────────
+          SliverAppBar(
+            expandedHeight: 140,
+            pinned: true,
+            stretch: true,
+            backgroundColor: isDark ? const Color(0xFF1A1A2E) : Colors.white,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      colorScheme.primaryContainer,
-                      colorScheme.secondaryContainer,
-                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [const Color(0xFF1A1A2E), const Color(0xFF16213E)]
+                        : [_accent, const Color(0xFF4A90D9)],
                   ),
-                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Welcome back!",
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onPrimaryContainer,
-                                ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Pick up right where you left off",
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: colorScheme.onPrimaryContainer
-                                      .withValues(alpha: 0.8),
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.auto_stories_rounded,
-                      size: 50,
-                      color: colorScheme.primary.withValues(alpha: 0.6),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Continue Reading Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Continue Reading",
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // TODO: View all
-                    },
-                    child: Text(
-                      "View All",
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              SizedBox(
-                height: 320,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: continueReading.length,
-                  itemBuilder: (context, index) {
-                    final item = continueReading[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: SizedBox(
-                        width: 180,
-                        child: Card(
-                          elevation: 2,
-                          shadowColor: colorScheme.shadow.withValues(
-                            alpha: 0.2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              // TODO: Navigate to reader
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Cover with gradient overlay
-                                Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: Container(
-                                        height: 200,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              colorScheme.primaryContainer,
-                                              colorScheme.secondaryContainer,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.book_rounded,
-                                          size: 70,
-                                          color: colorScheme.primary.withValues(
-                                            alpha: 0.5,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Progress badge
-                                    Positioned(
-                                      top: 12,
-                                      right: 12,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          "${item["progress"]}%",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall
-                                              ?.copyWith(
-                                                color: colorScheme.onPrimary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Title
-                                      Text(
-                                        item["title"],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 6),
-
-                                      // Chapter with icon
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.menu_book_rounded,
-                                            size: 16,
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            "Chapter ${item["chapter"]}",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.copyWith(
-                                                  color: colorScheme
-                                                      .onSurfaceVariant,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-
-                                      // Progress bar
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: LinearProgressIndicator(
-                                          value: item["progress"] / 100,
-                                          minHeight: 6,
-                                          backgroundColor: colorScheme
-                                              .surfaceContainerHighest,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                colorScheme.primary,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 48),
-
-              // My Library Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "My Library",
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: () {
-                      // TODO: Add new
-                    },
-                    icon: const Icon(Icons.add_circle_outline, size: 20),
-                    label: const Text("Add New"),
-                    style: TextButton.styleFrom(
-                      foregroundColor: colorScheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  childAspectRatio: 0.65,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 20,
-                ),
-                itemCount: myLibrary.length,
-                itemBuilder: (context, index) {
-                  final title = myLibrary[index];
-                  return InkWell(
-                    onTap: () {
-                      // TODO: Navigate to manga details/reader
-                    },
-                    borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 0, 22, 24),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  colorScheme.surfaceContainerHigh,
-                                  colorScheme.surfaceContainer,
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.shadow.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.book_rounded,
-                                size: 40,
-                                color: colorScheme.primary.withValues(
-                                  alpha: 0.6,
-                                ),
-                              ),
-                            ),
+                        Text(
+                          'Good morning, $username 👋',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 4),
                         Text(
-                          title,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          'Pick up where you left off',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-
-              const SizedBox(height: 32),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+                onPressed: () {},
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white70,
+                    size: 22,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
             ],
           ),
+
+          // ─── Body Content ───────────────────────────────────────────────
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // ─── Brand Label ──────────────────────────────────────────
+                Row(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [_accent, const Color(0xFF4A90D9)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.auto_stories_rounded,
+                          size: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Ink Scratch',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.6)
+                            : Colors.grey[500],
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // ─── Continue Reading ─────────────────────────────────────
+                _SectionHeader(
+                  title: 'CONTINUE READING',
+                  isDark: isDark,
+                  hasAction: true,
+                ),
+                const SizedBox(height: 14),
+
+                SizedBox(
+                  height: 230,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: continueReading.length,
+                    itemBuilder: (context, index) {
+                      final item = continueReading[index];
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          right: index < continueReading.length - 1 ? 14 : 0,
+                        ),
+                        child: _ReadingCard(item: item, isDark: isDark),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 36),
+
+                // ─── My Library ───────────────────────────────────────────
+                _SectionHeader(
+                  title: 'MY LIBRARY',
+                  isDark: isDark,
+                  hasAction: true,
+                  actionIcon: Icons.add_circle_outline,
+                ),
+                const SizedBox(height: 14),
+
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.62,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 18,
+                  ),
+                  itemCount: myLibrary.length,
+                  itemBuilder: (context, index) {
+                    final item = myLibrary[index];
+                    return _LibraryTile(
+                      title: item['title'],
+                      color: Color(item['color']),
+                      isDark: isDark,
+                    );
+                  },
+                ),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Section Header (label + optional action) ───────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final bool isDark;
+  final bool hasAction;
+  final IconData actionIcon;
+
+  const _SectionHeader({
+    required this.title,
+    required this.isDark,
+    this.hasAction = false,
+    this.actionIcon = Icons.chevron_right,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white24 : Colors.grey[400],
+            letterSpacing: 1.2,
+          ),
         ),
+        if (hasAction)
+          InkWell(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Row(
+                children: [
+                  Text(
+                    'See all',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: HomeScreen._accent,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(actionIcon, size: 15, color: HomeScreen._accent),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ─── Reading Card ────────────────────────────────────────────────────────────
+
+class _ReadingCard extends StatelessWidget {
+  final Map<String, dynamic> item;
+  final bool isDark;
+
+  const _ReadingCard({required this.item, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final int progress = item['progress'];
+
+    return SizedBox(
+      width: 170,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Cover ──
+                Stack(
+                  children: [
+                    Container(
+                      height: 130,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [
+                                  const Color(0xFF1A1A2E),
+                                  const Color(0xFF16213E),
+                                ]
+                              : [HomeScreen._accent, const Color(0xFF4A90D9)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.auto_stories_rounded,
+                          size: 52,
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ),
+                    // Progress badge
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$progress%',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // ── Info ──
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['title'],
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      // Chapter row
+                      Row(
+                        children: [
+                          Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: HomeScreen._accent.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.menu_book_rounded,
+                                size: 13,
+                                color: HomeScreen._accent,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Ch. ${item["chapter"]}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white38 : Colors.grey[500],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Progress bar
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: progress / 100,
+                          minHeight: 5,
+                          backgroundColor: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.grey[200],
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            HomeScreen._accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Library Tile ────────────────────────────────────────────────────────────
+
+class _LibraryTile extends StatelessWidget {
+  final String title;
+  final Color color;
+  final bool isDark;
+
+  const _LibraryTile({
+    required this.title,
+    required this.color,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color, color.withValues(alpha: 0.6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: isDark ? 0.2 : 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.book_rounded,
+                  size: 32,
+                  color: Colors.white.withValues(alpha: 0.45),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
